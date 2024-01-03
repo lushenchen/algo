@@ -1,5 +1,7 @@
 package com.alog.adt.tree.btree;
 
+import com.alog.adt.tree.Pair;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,9 +43,9 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
      * 先序遍历2-3tree
      * @return
      */
-    public List<KVPair<K, V>> preOrder()
+    public List<Pair<K, V>> preOrder()
     {
-        List<KVPair<K, V>> list = new ArrayList<>();
+        List<Pair<K, V>> list = new ArrayList<>();
         preOrder(this.root, list);
         return list;
     }
@@ -52,20 +54,20 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
      * 中序遍历2-3tree
      * @return
      */
-    public List<KVPair<K, V>> inOrder()
+    public List<Pair<K, V>> inOrder()
     {
-        List<KVPair<K, V>> list = new ArrayList<>();
+        List<Pair<K, V>> list = new ArrayList<>();
         inOrder(this.root, list);
         return list;
     }
     
     /**
-     * 后续遍历2-3tree
+     * 后序遍历2-3tree
      * @return
      */
-    public List<KVPair<K, V>> postOrder()
+    public List<Pair<K, V>> postOrder()
     {
-        List<KVPair<K, V>> list = new ArrayList<>();
+        List<Pair<K, V>> list = new ArrayList<>();
         postOrder(this.root, list);
         return list;
     }
@@ -97,7 +99,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
      * @param list 收集节点元素的集合
      * @return
      */
-    private void preOrder(Node<K, V> node, List<KVPair<K, V>> list)
+    private void preOrder(Node<K, V> node, List<Pair<K, V>> list)
     {
         if (node == null)
         {
@@ -125,7 +127,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
      * @param list 收集节点元素的集合
      * @return
      */
-    private void inOrder(Node<K, V> node, List<KVPair<K, V>> list)
+    private void inOrder(Node<K, V> node, List<Pair<K, V>> list)
     {
         if (node == null)
         {
@@ -155,7 +157,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
      * @param node 指定的节点
      * @param list 收集节点元素的集合
      */
-    private void postOrder(Node<K, V> node, List<KVPair<K, V>> list)
+    private void postOrder(Node<K, V> node, List<Pair<K, V>> list)
     {
         if (node == null)
         {
@@ -179,13 +181,13 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     }
     
     /**
-     * 通过子节点
+     * 通过子节点插入元素
      * @param key 待插入的元素Key
      * @param value 待插入的元素Value
      */
     private void insertByLeafNode(K key, V value)
     {
-        KVPair<K, V> kvPair = createPair(key, value);
+        Pair<K, V> kvPair = createPair(key, value);
         // 如果根节点为空，创建根节点
         if (root == null)
         {
@@ -194,7 +196,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
         }
         // 根据Key找到适合插入该值的叶子节点
         Node<K, V> leafNode = findLeafByKey(key);
-        // 创建2-节点
+        // 创建一个新的2-节点
         Node<K, V> twoNode = createTwoNode(kvPair, null, null);
         // 向目标节点中合并2-节点
         merge(leafNode, twoNode);
@@ -247,7 +249,9 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
         // 目标节点是3-节点
         if (target.isThreeNode())
         {
+            // 将临时4-节点分裂成2-节点
             Node<K, V> tempTwoNode = split(target, twoNode);
+            // 合并目标节点的父节点和分裂出来的2-节点
             merge(target.parent, tempTwoNode);
         }
     }
@@ -419,7 +423,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
      * @param center 2-节点的中间子树
      * @return
      */
-    private Node<K, V> createTwoNode(KVPair<K, V> less, Node<K, V> left, Node<K, V> center)
+    private Node<K, V> createTwoNode(Pair<K, V> less, Node<K, V> left, Node<K, V> center)
     {
         return new Node<>(less, left, center);
     }
@@ -430,7 +434,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
      * @param value 指定的Value
      * @return
      */
-    private KVPair<K, V> createPair(K key, V value)
+    private Pair<K, V> createPair(K key, V value)
     {
         return new KVPair<>(key, value);
     }
@@ -472,14 +476,14 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
          */
         Node<K, V> parent;
     
-        public Node(KVPair<K, V> less)
+        public Node(Pair<K, V> less)
         {
-            this.less = less;
+            this.less =  (KVPair<K, V>)less;
         }
         
-        public Node(KVPair<K, V> less, Node<K, V> left, Node<K, V> center)
+        public Node(Pair<K, V> less, Node<K, V> left, Node<K, V> center)
         {
-            this.less = less;
+            this.less = (KVPair<K, V>) less;
             this.left = left;
             this.center = center;
         }
@@ -576,7 +580,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
      * @param <K>
      * @param <V>
      */
-    static class KVPair<K extends Comparable<? super K>, V>
+    static class KVPair<K extends Comparable<? super K>, V> implements Pair<K, V>
     {
         /**
          * Key对象

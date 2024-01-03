@@ -1,6 +1,9 @@
 package com.algo.adt.tree;
 
+import com.alog.adt.tree.Pair;
 import com.alog.adt.tree.btree.TwoThreeTree;
+
+import java.util.List;
 
 /**
  * 2-3树测试
@@ -18,8 +21,7 @@ public class TwoThreeTreeTest
             tree.insert(i, i);
         }
         tree.print();
-        System.out.println(tree.preOrder());
-        System.out.println(tree.inOrder());
-        System.out.println(tree.postOrder());
+        List<Pair<Integer, Integer>> kvPairs = tree.inOrder();
+        System.out.println(kvPairs);
     }
 }
