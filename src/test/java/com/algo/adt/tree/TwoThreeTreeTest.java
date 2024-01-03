@@ -18,5 +18,8 @@ public class TwoThreeTreeTest
             tree.insert(i, i);
         }
         tree.print();
+        System.out.println(tree.preOrder());
+        System.out.println(tree.inOrder());
+        System.out.println(tree.postOrder());
     }
 }

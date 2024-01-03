@@ -1,6 +1,8 @@
 package com.alog.adt.tree.btree;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -23,6 +25,157 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     public void insert(K key, V value)
     {
         insertByLeafNode(key, value);
+    }
+    
+    /**
+     * 在树中寻找指定key的元素
+     * @param key 指定的key
+     * @return
+     */
+    public Node<K, V> find(K key)
+    {
+        return find(this.root, key);
+    }
+    
+    /**
+     * 先序遍历2-3tree
+     * @return
+     */
+    public List<KVPair<K, V>> preOrder()
+    {
+        List<KVPair<K, V>> list = new ArrayList<>();
+        preOrder(this.root, list);
+        return list;
+    }
+    
+    /**
+     * 中序遍历2-3tree
+     * @return
+     */
+    public List<KVPair<K, V>> inOrder()
+    {
+        List<KVPair<K, V>> list = new ArrayList<>();
+        inOrder(this.root, list);
+        return list;
+    }
+    
+    /**
+     * 后续遍历2-3tree
+     * @return
+     */
+    public List<KVPair<K, V>> postOrder()
+    {
+        List<KVPair<K, V>> list = new ArrayList<>();
+        postOrder(this.root, list);
+        return list;
+    }
+    
+    /**
+     * 获取指定节点的中序前驱节点
+     * @param node 指定节点
+     * @return 存在即返回，不存在返回NULl
+     */
+    public Node<K, V> precursor(Node<K, V> node)
+    {
+        return null;
+    }
+    
+    /**
+     * 获取指定节点的中序后继节点
+     * @param node 指定节点
+     * @return 存在即返回，不存在返回NULl
+     */
+    public Node<K, V> successor(Node<K, V> node)
+    {
+        return null;
+    }
+    
+    
+    /**
+     * 先序遍历辅助
+     * @param node 指定的节点
+     * @param list 收集节点元素的集合
+     * @return
+     */
+    private void preOrder(Node<K, V> node, List<KVPair<K, V>> list)
+    {
+        if (node == null)
+        {
+            return;
+        }
+        list.add(node.less);
+        preOrder(node.left, list);
+        // 2-叶子节点终止条件
+        if (node.isLeaf() && node.isTwoNode())
+        {
+            return;
+        }
+        preOrder(node.center, list);
+        // 3-节点
+        if (node.isThreeNode())
+        {
+            list.add(node.grater);
+        }
+        preOrder(node.right, list);
+    }
+    
+    /**
+     * 中序遍历辅助
+     * @param node 指定的节点
+     * @param list 收集节点元素的集合
+     * @return
+     */
+    private void inOrder(Node<K, V> node, List<KVPair<K, V>> list)
+    {
+        if (node == null)
+        {
+            return;
+        }
+        inOrder(node.left, list);
+        list.add(node.less);
+        // 2-叶子节点终止条件
+        if (node.isLeaf() && node.isTwoNode())
+        {
+            return;
+        }
+        inOrder(node.center, list);
+        // 3-节点
+        if (node.isThreeNode())
+        {
+            list.add(node.grater);
+            if (!node.isLeaf())
+            {
+                inOrder(node.right, list);
+            }
+        }
+    }
+    
+    /**
+     * 后序遍历辅助
+     * @param node 指定的节点
+     * @param list 收集节点元素的集合
+     */
+    private void postOrder(Node<K, V> node, List<KVPair<K, V>> list)
+    {
+        if (node == null)
+        {
+            return;
+        }
+        postOrder(node.left, list);
+        // 2-叶子节点终止条件
+        if (node.isLeaf() && node.isTwoNode())
+        {
+            list.add(node.less);
+            return;
+        }
+        postOrder(node.center, list);
+        postOrder(node.right, list);
+        list.add(node.less);
+        // 3-节点
+        if (node.isThreeNode())
+        {
+            list.add(node.grater);
+        }
     }
     
     /**
@@ -76,11 +229,12 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
                 // 将target的less元素移动到grater
                 target.grater = temp;
             }
+            // 如果目标节点是叶子节点，直接合并
             if (target.isLeaf())
             {
                 return;
             }
-            // 重新调整节点的指向
+            // target成为一个3-节点，重新调整节点的指向
             // 1.target元素的center子树指向twoNode的left
             target.center = twoNode.left;
             // 2.target元素的right子树执行twoNode的center
@@ -135,6 +289,45 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
         tempLeft.parent = newTwoNode;
         twoNode.parent = newTwoNode;
        return newTwoNode;
+    }
+    
+    /**
+     * 从指定节点开始寻找Key
+     * @param node 指定的节点
+     * @param key 需要寻找的key
+     * @return
+     */
+    private Node<K, V> find(Node<K, V> node, K key)
+    {
+        // 未找到指定的key
+        if(node == null)
+        {
+            return null;
+        }
+        // 终止条件
+        // 1.节点的较小值匹配
+        if (key.compareTo(node.less.key) == 0)
+        {
+            return node;
+        }
+        // 2.如果是3-节点，节点的较大值匹配
+        if (node.isThreeNode() && key.compareTo(node.grater.key) == 0)
+        {
+            return node;
+        }
+        if (key.compareTo(node.less.key) < 0)
+        {
+            return find(node.left, key);
+        }else if (node.isTwoNode())
+        {
+            return find(node.center, key);
+        }else if (key.compareTo(node.grater.key) < 0)
+        {
+            return find(node.center, key);
+        }else
+        {
+            return find(node.right, key);
+        }
     }
     
     /**
