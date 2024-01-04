@@ -357,7 +357,7 @@ public enum Sorts
                     System.arraycopy(asst, 1, arr, 0, asst.length - 1);
                     
                 }
-    
+                
                 /**
                  * 将现有数组的元素构建成一个大顶堆
                  * @param heap 乱序的数组
@@ -371,7 +371,7 @@ public enum Sorts
                         sink(heap, i, heap.length - 1);
                     }
                 }
-    
+                
                 /**
                  * 通过下沉算法，对堆中位于target的元素做下沉操作，范围是0-range
                  * @param heap
@@ -388,13 +388,16 @@ public enum Sorts
                         if (2 * target + 1 > range)
                         {
                             max = 2 * target;
-                        }else
+                        }
+                        else
                         {
                             // 取左右子树的最大值
                             if (Heap.greater(heap[2 * target], heap[2 * target + 1]))
                             {
                                 max = 2 * target;
-                            }else {
+                            }
+                            else
+                            {
                                 max = 2 * target + 1;
                             }
                         }

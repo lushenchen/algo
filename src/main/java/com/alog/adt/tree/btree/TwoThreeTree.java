@@ -22,6 +22,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 返回插入的元素
+     *
      * @return
      */
     public void insert(K key, V value)
@@ -31,6 +32,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 在树中寻找指定key的元素
+     *
      * @param key 指定的key
      * @return
      */
@@ -41,6 +43,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 先序遍历2-3tree
+     *
      * @return
      */
     public List<Pair<K, V>> preOrder()
@@ -52,6 +55,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 中序遍历2-3tree
+     *
      * @return
      */
     public List<Pair<K, V>> inOrder()
@@ -63,6 +67,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 后序遍历2-3tree
+     *
      * @return
      */
     public List<Pair<K, V>> postOrder()
@@ -74,6 +79,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 获取指定节点的中序前驱节点
+     *
      * @param node 指定节点
      * @return 存在即返回，不存在返回NULl
      */
@@ -84,6 +90,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 获取指定节点的中序后继节点
+     *
      * @param node 指定节点
      * @return 存在即返回，不存在返回NULl
      */
@@ -95,6 +102,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 先序遍历辅助
+     *
      * @param node 指定的节点
      * @param list 收集节点元素的集合
      * @return
@@ -123,6 +131,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 中序遍历辅助
+     *
      * @param node 指定的节点
      * @param list 收集节点元素的集合
      * @return
@@ -154,6 +163,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 后序遍历辅助
+     *
      * @param node 指定的节点
      * @param list 收集节点元素的集合
      */
@@ -182,7 +192,8 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 通过子节点插入元素
-     * @param key 待插入的元素Key
+     *
+     * @param key   待插入的元素Key
      * @param value 待插入的元素Value
      */
     private void insertByLeafNode(K key, V value)
@@ -204,7 +215,8 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 合并节点
-     * @param target 需要合并的目标节点
+     *
+     * @param target  需要合并的目标节点
      * @param twoNode 需要合并到树中的2-节点
      */
     private void merge(Node<K, V> target, Node<K, V> twoNode)
@@ -224,7 +236,9 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
             {
                 // 将值合并到目标节点的较大值（grater)
                 target.grater = insertion;
-            }else {
+            }
+            else
+            {
                 KVPair<K, V> temp = target.less;
                 // insertion移动到target的less元素
                 target.less = insertion;
@@ -258,6 +272,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 分裂节点
+     *
      * @param target
      * @param twoNode
      */
@@ -271,11 +286,13 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
         {
             upgrade = target.less;
             target.less = insertion;
-        }else if (insertion.key.compareTo(target.grater.key) > 0)
+        }
+        else if (insertion.key.compareTo(target.grater.key) > 0)
         {
             upgrade = target.grater;
             target.grater = insertion;
-        }else
+        }
+        else
         {
             upgrade = insertion;
         }
@@ -292,19 +309,20 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
         Node<K, V> newTwoNode = createTwoNode(upgrade, tempLeft, twoNode);
         tempLeft.parent = newTwoNode;
         twoNode.parent = newTwoNode;
-       return newTwoNode;
+        return newTwoNode;
     }
     
     /**
      * 从指定节点开始寻找Key
+     *
      * @param node 指定的节点
-     * @param key 需要寻找的key
+     * @param key  需要寻找的key
      * @return
      */
     private Node<K, V> find(Node<K, V> node, K key)
     {
         // 未找到指定的key
-        if(node == null)
+        if (node == null)
         {
             return null;
         }
@@ -322,13 +340,16 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
         if (key.compareTo(node.less.key) < 0)
         {
             return find(node.left, key);
-        }else if (node.isTwoNode())
+        }
+        else if (node.isTwoNode())
         {
             return find(node.center, key);
-        }else if (key.compareTo(node.grater.key) < 0)
+        }
+        else if (key.compareTo(node.grater.key) < 0)
         {
             return find(node.center, key);
-        }else
+        }
+        else
         {
             return find(node.right, key);
         }
@@ -336,6 +357,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 通过Key找到一个符合条件的叶子节点
+     *
      * @param key
      * @return
      */
@@ -354,7 +376,8 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
                 if (key.compareTo(curr.less.key) < 0)
                 {
                     curr = curr.left;
-                }else
+                }
+                else
                 {
                     curr = curr.center;
                 }
@@ -367,14 +390,15 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
                 if (key.compareTo(curr.less.key) < 0)
                 {
                     curr = curr.left;
-                }else if (key.compareTo(curr.grater.key) > 0)
+                }
+                else if (key.compareTo(curr.grater.key) > 0)
                 {
                     curr = curr.right;
-                }else
+                }
+                else
                 {
                     curr = curr.center;
                 }
-                continue;
             }
         }
         return curr;
@@ -418,8 +442,9 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 创建一个有<b>左子树</b>和<b>中间子树</b>的2-节点
-     * @param less 2-节点的元素
-     * @param left 2-节点的左子树
+     *
+     * @param less   2-节点的元素
+     * @param left   2-节点的左子树
      * @param center 2-节点的中间子树
      * @return
      */
@@ -430,7 +455,8 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 创建键值对
-     * @param key 指定的Key
+     *
+     * @param key   指定的Key
      * @param value 指定的Value
      * @return
      */
@@ -441,6 +467,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 节点类
+     *
      * @param <K> 节点中存储的Key类型
      * @param <V> 节点中存储的Value类型
      */
@@ -450,35 +477,35 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
          * 节点中的小值元素
          */
         KVPair<K, V> less;
-    
+        
         /**
          * 节点中的大值元素
          */
         KVPair<K, V> grater;
-    
+        
         /**
          * 左子树
          */
         Node<K, V> left;
-    
+        
         /**
          * 中间子树
          */
         Node<K, V> center;
-    
+        
         /**
          * 右子树
          */
         Node<K, V> right;
-    
+        
         /**
          * 父节点
          */
         Node<K, V> parent;
-    
+        
         public Node(Pair<K, V> less)
         {
-            this.less =  (KVPair<K, V>)less;
+            this.less = (KVPair<K, V>) less;
         }
         
         public Node(Pair<K, V> less, Node<K, V> left, Node<K, V> center)
@@ -487,7 +514,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
             this.left = left;
             this.center = center;
         }
-    
+        
         public Node(KVPair<K, V> less, KVPair<K, V> grater)
         {
             this.less = less;
@@ -508,62 +535,62 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
         {
             return this.grater != null;
         }
-    
+        
         public KVPair<K, V> getLess()
         {
             return less;
         }
-    
+        
         public void setLess(KVPair<K, V> less)
         {
             this.less = less;
         }
-    
+        
         public KVPair<K, V> getGrater()
         {
             return grater;
         }
-    
+        
         public void setGrater(KVPair<K, V> grater)
         {
             this.grater = grater;
         }
-    
+        
         public Node<K, V> getLeft()
         {
             return left;
         }
-    
+        
         public void setLeft(Node<K, V> left)
         {
             this.left = left;
         }
-    
+        
         public Node<K, V> getCenter()
         {
             return center;
         }
-    
+        
         public void setCenter(Node<K, V> center)
         {
             this.center = center;
         }
-    
+        
         public Node<K, V> getRight()
         {
             return right;
         }
-    
+        
         public void setRight(Node<K, V> right)
         {
             this.right = right;
         }
-    
+        
         public Node<K, V> getParent()
         {
             return parent;
         }
-    
+        
         public void setParent(Node<K, V> parent)
         {
             this.parent = parent;
@@ -577,6 +604,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 键值对对象
+     *
      * @param <K>
      * @param <V>
      */
@@ -597,7 +625,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
             this.key = key;
             this.value = value;
         }
-    
+        
         public K getKey()
         {
             return this.key;
