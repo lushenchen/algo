@@ -341,12 +341,6 @@ public enum Sorts
                     System.arraycopy(arr, 0, asst, 1, arr.length);
                     // 构建大顶堆
                     buildMaxHeap(asst);
-                    // 循环删除堆顶元素，并将剩余的元素重新构建大顶堆
-                    for (int i = 1; i < asst.length; i++)
-                    {
-                        System.out.print(asst[i] + " ");
-                    }
-                    System.out.println();
                     // 通过不断移除堆顶元素，将剩余的元素重新调整成大顶堆
                     for (int i = asst.length - 1; i > 0; i--)
                     {
