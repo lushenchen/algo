@@ -78,27 +78,252 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     }
     
     /**
-     * 获取指定节点的中序前驱节点
+     * 返回指定元素的中序前驱元素<br/>
+     * PS:这边是只找到了前驱节点，忽略3-叶子节点本身的前驱是自己的情况
      *
-     * @param node 指定节点
-     * @return 存在即返回，不存在返回NULl
+     * @param key 指定的键
+     * @return
      */
-    public Node<K, V> precursor(Node<K, V> node)
+    public Pair<K, V> precursor(K key)
     {
-        return null;
+        Node<K, V> node = precursor(this.root, key);
+        if (node == null)
+        {
+            return null;
+        }
+        if (node.isTwoNode())
+        {
+            return node.less;
+        }
+        if (node.grater.key.compareTo(key) < 0)
+        {
+            return node.grater;
+        }
+        return node.less;
     }
     
     /**
-     * 获取指定节点的中序后继节点
+     * 返回指定元素的中序后继元素<br/>
+     * PS:这边是只找到了后继节点，忽略3-叶子节点本身的后继是自己的情况
      *
-     * @param node 指定节点
-     * @return 存在即返回，不存在返回NULl
+     * @param key 指定的键
+     * @return
      */
-    public Node<K, V> successor(Node<K, V> node)
+    public Pair<K, V> successor(K key)
     {
-        return null;
+        Node<K, V> node = successor(this.root, key);
+        if (node == null)
+        {
+            return null;
+        }
+        if (node.isTwoNode())
+        {
+            return node.less;
+        }
+        if (node.less.key.compareTo(key) < 0)
+        {
+            return node.grater;
+        }
+        return node.less;
     }
     
+    /**
+     * 获取指定2-3tree中的最小节点
+     * @param node 指定的2-3树
+     * @return
+     */
+    public Node<K, V> getMin(Node<K, V> node)
+    {
+        if (node.isLeaf())
+        {
+            return node;
+        }
+        return getMin(node.left);
+    }
+    
+    /**
+     * 获取指定2-3tree中的最大节点
+     * @param node 指定的2-3树
+     * @return
+     */
+    public Node<K, V> getMax(Node<K, V> node)
+    {
+        if (node == null || node.isLeaf())
+        {
+            return node;
+        }
+        if (node.isTwoNode())
+        {
+            return getMax(node.center);
+        }
+        return getMax(node.right);
+    }
+    
+    /**
+     * 打印树结构
+     */
+    public void print()
+    {
+        // 双队列完成树的打印
+        Queue<Node<K, V>> top = new LinkedList<>();
+        Queue<Node<K, V>> low = new LinkedList<>();
+        top.offer(this.root);
+        while (!top.isEmpty() || !low.isEmpty())
+        {
+            // 如果上层节点遍历完了，换行，同时将下一层的节点全部放入上层
+            if (top.isEmpty())
+            {
+                while (!low.isEmpty())
+                {
+                    top.offer(low.poll());
+                }
+                System.out.println();
+            }
+            Node node = top.poll();
+            System.out.print(node + "    ");
+            if (node.isLeaf())
+            {
+                continue;
+            }
+            low.offer(node.left);
+            low.offer(node.center);
+            if (node.isThreeNode())
+            {
+                low.offer(node.right);
+            }
+        }
+        System.out.println();
+    }
+    
+    /**
+     * 寻找指定元素所在节点的中序前驱
+     *
+     * @param node 指定节点
+     * @param key 指定的键
+     * @return 存在即返回，不存在返回NULl
+     */
+    private Node<K, V> precursor(Node<K, V> node, K key)
+    {
+        Node<K, V> current = find(node, key);
+        if (current == null)
+        {
+            return null;
+        }
+        // 非叶子2-节点
+        if (current.isTwoNode() && !current.isLeaf())
+        {
+            return getMax(current.left);
+            
+        }else if (current.isThreeNode() && !current.isLeaf())
+        {
+            // 非叶子3-节点，且有右子树
+            if (key.compareTo(current.less.key) == 0)
+            {
+                // 较小值
+                return getMax(current.left);
+            }else
+            {
+                // 较大值
+                return getMax(current.center);
+            }
+            
+        }else
+        {
+            // 从指定树的根节点遍历，走到当前节点，current节点一定是在祖先节点的中间子树或者右子树
+            Node<K, V> ancestor = node, precursor = null;
+            while(ancestor != current)
+            {
+                // 比较current的key和ancestor中较大键的大小
+                // ancestor中的key较小，则需要往右移动
+                if (ancestor.isTwoNode() && ancestor.less.key.compareTo(key) < 0)
+                {
+                    precursor = ancestor;
+                    ancestor = ancestor.center;
+                }else if (ancestor.isThreeNode())
+                {
+                    if (ancestor.less.key.compareTo(key) < 0 && ancestor.grater.key.compareTo(key) > 0)
+                    {
+                        precursor = ancestor;
+                        ancestor = ancestor.center;
+                    }else if (ancestor.grater.key.compareTo(key) < 0)
+                    {
+                        precursor = ancestor;
+                        ancestor = ancestor.right;
+                    }else {
+                        ancestor = ancestor.left;
+                    }
+                }else
+                {
+                    ancestor = ancestor.left;
+                }
+            }
+            return precursor;
+        }
+    }
+    
+    /**
+     * 寻找指定元素所在节点的中序后继
+     *
+     * @param node 指定节点
+     * @param key 指定的键
+     * @return 存在即返回，不存在返回NULl
+     */
+    private Node<K, V> successor(Node<K, V> node, K key)
+    {
+        // 查找节点
+        Node<K, V> current = find(node, key);
+        if (current == null)
+        {
+            return null;
+        }
+        // 非叶子2-节点
+        if (current.isTwoNode() && !current.isLeaf())
+        {
+            // 中间子树的最小值
+            return getMin(current.center);
+        }else if (current.isThreeNode() && !current.isLeaf())
+        {
+            // 判断值是较大值还是较小值
+            if (key.compareTo(current.less.key) == 0)
+            {
+                return getMin(current.center);
+            }
+            return getMin(current.right);
+        }else {
+            // 找祖先节点，此时节点的后驱在最靠近节点的祖先的左子树或者中间子树上
+            Node<K, V> ancestor = node, successor = null;
+            while (ancestor != current)
+            {
+                if (ancestor.isTwoNode() && ancestor.less.key.compareTo(key) > 0)
+                {
+                    successor = ancestor;
+                    ancestor = ancestor.left;
+                }else if (ancestor.isThreeNode())
+                {
+                    if (ancestor.less.key.compareTo(key) > 0)
+                    {
+                        successor = ancestor;
+                        ancestor = ancestor.left;
+                    }else if (ancestor.less.key.compareTo(key) < 0 && ancestor.grater.key.compareTo(key) > 0)
+                    {
+                        successor = ancestor;
+                        ancestor = ancestor.center;
+                    }else {
+                        ancestor = ancestor.right;
+                    }
+                }else {
+                    if (ancestor.isTwoNode())
+                    {
+                        ancestor = ancestor.center;
+                    }else
+                    {
+                        ancestor = ancestor.right;
+                    }
+                }
+            }
+            return successor;
+        }
+    }
     
     /**
      * 先序遍历辅助
@@ -405,42 +630,6 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     }
     
     /**
-     * 打印树结构
-     */
-    public void print()
-    {
-        // 双队列完成树的打印
-        Queue<Node<K, V>> top = new LinkedList<>();
-        Queue<Node<K, V>> low = new LinkedList<>();
-        top.offer(this.root);
-        while (!top.isEmpty() || !low.isEmpty())
-        {
-            // 如果上层节点遍历完了，换行，同时将下一层的节点全部放入上层
-            if (top.isEmpty())
-            {
-                while (!low.isEmpty())
-                {
-                    top.offer(low.poll());
-                }
-                System.out.println();
-            }
-            Node node = top.poll();
-            System.out.print(node + "    ");
-            if (node.isLeaf())
-            {
-                continue;
-            }
-            low.offer(node.left);
-            low.offer(node.center);
-            if (node.isThreeNode())
-            {
-                low.offer(node.right);
-            }
-        }
-        System.out.println();
-    }
-    
-    /**
      * 创建一个有<b>左子树</b>和<b>中间子树</b>的2-节点
      *
      * @param less   2-节点的元素
@@ -463,6 +652,11 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     private Pair<K, V> createPair(K key, V value)
     {
         return new KVPair<>(key, value);
+    }
+    
+    public Node<K, V> getRoot()
+    {
+        return root;
     }
     
     /**
