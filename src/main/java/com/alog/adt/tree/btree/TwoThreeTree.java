@@ -79,7 +79,6 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 返回指定元素的中序前驱元素<br/>
-     * PS:这边是只找到了前驱节点，忽略3-叶子节点本身的前驱是自己的情况
      *
      * @param key 指定的键
      * @return
@@ -104,7 +103,6 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
     
     /**
      * 返回指定元素的中序后继元素<br/>
-     * PS:这边是只找到了后继节点，忽略3-叶子节点本身的后继是自己的情况
      *
      * @param key 指定的键
      * @return
@@ -120,7 +118,7 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
         {
             return node.less;
         }
-        if (node.less.key.compareTo(key) < 0)
+        if (node.less.key.compareTo(key) <= 0)
         {
             return node.grater;
         }
@@ -256,6 +254,11 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
                 {
                     ancestor = ancestor.left;
                 }
+                // 3-叶子节点，如果此时较大值和key相同，则该3-节点是自己的前驱
+                if (ancestor == current && current.isThreeNode() && current.grater.key.compareTo(key) == 0)
+                {
+                    precursor = ancestor;
+                }
             }
             return precursor;
         }
@@ -320,6 +323,11 @@ public class TwoThreeTree<K extends Comparable<? super K>, V>
                         ancestor = ancestor.right;
                     }
                 }
+            }
+            // 3-叶子节点，如果此时较大值和key相同，则该3-节点是自己的后继
+            if (ancestor == current && current.isThreeNode() && current.less.key.compareTo(key) == 0)
+            {
+                successor = ancestor;
             }
             return successor;
         }
